@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.concurrent.CyclicBarrier;
 
 import utils.FileChecker;
+import utils.Logger;
 
 
 public class Server {
@@ -15,6 +16,7 @@ public class Server {
     private String fileHash;
     private File file;
     private CyclicBarrier cb;
+    private Logger logger;
 
     /**
      * Inicializa el servidor
@@ -33,22 +35,30 @@ public class Server {
         }
 
         this.numConections = numConections;
+        this.logger = new Logger("TCPServer");
+
         if(file == 1) {
             this.file = new File(file100MB);
+            logger.log("Creating server. File name: " + file100MB + ". File size: 100MB");
         } else {
             this.file = new File(file250MB);
+            logger.log("Creating server. File name: " + file250MB + ". File size: 250MB");
         }
         this.fileHash = FileChecker.generateHash(this.file);
         this.cb = new CyclicBarrier(numConections);
+        logger.log("Server created succesfully. Starting server with " +
+            Integer.toString(numConections) + " concurrent connections.");
         startServer();
     }
 
     private void startServer() {
+        logger.log("Waiting for connections...");
         try {
-            while(true) {
+            for (int i = 0; i < numConections; i++) {
                 ServerSocket serverSocket = new ServerSocket(6868);
                 Socket socket = serverSocket.accept();
-                ServerWorker sw = new ServerWorker(file, fileHash, socket, cb);
+                logger.log("Connection # " + (i + 1) + "receibed. Starting ServerWorker with ID: " + i);
+                ServerWorker sw = new ServerWorker(i, file, fileHash, socket, cb, logger);
                 sw.start();
             }
         } catch (Exception e) {
@@ -56,5 +66,9 @@ public class Server {
             e.printStackTrace();
         }
 
+    }
+
+    public static void main(String[] args) {
+        new Server(1, 1);
     }
 }
