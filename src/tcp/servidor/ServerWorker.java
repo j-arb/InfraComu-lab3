@@ -65,8 +65,10 @@ public class ServerWorker extends Thread {
             log("Sending file size");
             writer.println(file.length());
             log("Starting file transmition");
+            long startTime = System.currentTimeMillis();
             sendFile(file);
-            log("Finished file transmition");
+            long endTime = System.currentTimeMillis();
+            log("Finished file transmition in " + (endTime - startTime) + " ms");
             socket.close();
             log("Connection closed.");
             endCb.await();
