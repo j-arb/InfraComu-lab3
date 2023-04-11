@@ -18,7 +18,7 @@ import utils.Logger;
 public class Client extends Thread {
 
     private static final String CLIENT_FILES_DIR = "files/client";
-    private static final String SERVER_ADDRESS = "localhost";
+    private static final String SERVER_ADDRESS = "192.168.182.138" /** "192.168.182.138"*/;
     private static final int SERVER_PORT = 6868;
 
     private Socket socket;
