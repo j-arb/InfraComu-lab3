@@ -15,7 +15,7 @@ import utils.Logger;
 public class Client extends Thread {
 
     private static final String CLIENT_FILES_DIR = "files/client";
-    private static final String SERVER_ADDRESS = "localhost";
+    private static final String SERVER_ADDRESS = "192.168.182.138";
     private static final int SERVER_PORT = 6869;
     private static final int FILE_DATAGRAM_SIZE = 10*1024;
 
@@ -39,7 +39,7 @@ public class Client extends Thread {
         try {
             log("Starting client");
             this.socket = new DatagramSocket();
-            socket.setSoTimeout(50);
+            socket.setSoTimeout(200);
             log("Socket created. Requesting file size");
             byte[] buf = Converter.longToByteArray(-2);
             DatagramPacket reqDatagram = new DatagramPacket(
@@ -58,8 +58,10 @@ public class Client extends Thread {
             log("File size correct. Starting file transfer");
             String filePath = Paths.get(CLIENT_FILES_DIR, "ClienteUDP " + id + " de " + numConnections +
                 ".bin").toString();
+            long startTime = System.currentTimeMillis();
             receiveFile(filePath);
-            log("File received and stored on " + filePath);
+            long endTime = System.currentTimeMillis();
+            log("File received and stored on " + filePath + " in " + (endTime - startTime) + "ms");
             endCb.await();
             log("Thread end");
         } catch (Exception e) {
